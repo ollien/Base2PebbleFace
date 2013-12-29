@@ -197,6 +197,12 @@ void handle_time_change(struct tm *tick_time, TimeUnits units_changed){
 	
 }
 
+void bluetooth_connection_callback(bool connected){
+	if (!connected){
+		vibes_double_pulse();
+	}
+}
+
 void handle_init(void) {
 	  my_window = window_create();
 	window_stack_push(my_window, true);
@@ -207,7 +213,7 @@ void handle_init(void) {
 	layer_set_update_proc(display_layer, draw_layer_update_proc);
 	layer_add_child(window_layer, display_layer);
 	tick_timer_service_subscribe(MINUTE_UNIT,handle_time_change);
-		
+	 bluetooth_connection_service_subscribe(bluetooth_connection_callback);
 }
 
 void handle_deinit(void) {
