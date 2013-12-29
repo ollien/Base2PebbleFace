@@ -1,0 +1,18 @@
+{
+    "versionLabel": "1.0",
+    "uuid": "373d2d1f-4808-44eb-8d08-f3c11ffe7009",
+    "appKeys": {},
+    "longName": "Base 2",
+    "versionCode": 1,
+    "capabilities": [
+        ""
+    ],
+    "shortName": "Base 2",
+    "companyName": "ollien",
+    "watchapp": {
+        "watchface": true
+    },
+    "resources": {
+        "media": []
+    }
+}
