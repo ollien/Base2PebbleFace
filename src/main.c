@@ -5,7 +5,16 @@ TextLayer *text_layer;
 int rowNum=1;
 time_t now;
 Layer * display_layer;
+char *dayBuffer;
+struct tm * timePoint;
+Layer * window_layer;
+char * numChar;
 int fourth = 0;
+TextLayer * numLayers[19];
+int textLayerIndex=0;
+int progressCount=0;
+int runCount;
+
 char* itoa(int val, int base){
 	
 	static char buf[32] = {0};
@@ -66,21 +75,21 @@ void draw_dot_with_text(GContext *ctx,Layer * layer, GPoint center, bool filled,
 	else{
 		graphics_draw_circle(ctx, center, 10);	
 	}
-	TextLayer *temp = text_layer_create(GRect(center.x-4,center.y-25,50,90));
-	char * numChar = malloc(strlen(itoa(num,10))+1);
+	
+	numLayers[textLayerIndex] = text_layer_create(GRect(center.x-4,center.y-25,50,90));
+	numChar = malloc(strlen(itoa(num,10))+1);
 	strcpy(numChar,itoa(num,10));
-	text_layer_set_text(temp, numChar);
-	text_layer_set_background_color(temp, GColorClear);
-	text_layer_set_text_color(temp, GColorWhite);
-	layer_add_child(layer,text_layer_get_layer(temp));
-
+	text_layer_set_text(numLayers[textLayerIndex], numChar);
+	text_layer_set_background_color(numLayers[textLayerIndex], GColorClear);
+	text_layer_set_text_color(numLayers[textLayerIndex], GColorWhite);
+	layer_add_child(layer,text_layer_get_layer(numLayers[textLayerIndex]));
+	textLayerIndex++;
 
 }
 
 //if timeDot is true, do time, else, do date
 void draw_row(GContext *ctx,Layer *layer,unsigned int count,bool timeDot){
 	int x=15;
-	struct tm * timePoint;
 	time(&now);
 	timePoint = localtime(&now);
 	char timeBuffer[3];
@@ -103,6 +112,7 @@ void draw_row(GContext *ctx,Layer *layer,unsigned int count,bool timeDot){
 		else{
 			num=stoi(timeBuffer);
 		}
+		
 		strcpy(binaryBuffer,itoa(num,2));
 		revString(binaryBuffer);
 	}
@@ -148,10 +158,8 @@ void add_day_of_week(Layer * layer, GContext * ctx){
 	text_layer_set_text_color(text_layer, GColorWhite);
 	text_layer_set_font(text_layer, fonts_get_system_font(FONT_KEY_ROBOTO_CONDENSED_21 ));
 	text_layer_set_background_color(text_layer, GColorClear);
-	struct tm * timePoint;
 	time(&now);
 	timePoint = localtime(&now);
-	char *dayBuffer;
 	dayBuffer="Failssday";
 	switch(timePoint->tm_wday){
 		case 0:
@@ -176,7 +184,7 @@ void add_day_of_week(Layer * layer, GContext * ctx){
 			dayBuffer="Saturday";
 			break;
 	}
-			
+	dayBuffer=itoa(runCount,10);
 			
 	text_layer_set_text(text_layer,dayBuffer);
 	layer_add_child(layer, text_layer_get_layer(text_layer));
@@ -197,9 +205,16 @@ void draw_layer_update_proc(Layer * layer, GContext *ctx){
 }
 
 void handle_time_change(struct tm *tick_time, TimeUnits units_changed){ 
+	runCount++;
 	rowNum=1;
+	for (int i=0; i<19; i++){
+		text_layer_destroy(numLayers[i]);
+	}
+	textLayerIndex=0;
+	free(numChar);
 	layer_remove_child_layers(display_layer);
 	layer_mark_dirty(display_layer);
+
 	
 }
 
@@ -214,11 +229,11 @@ void handle_init(void) {
 	window_stack_push(my_window, true);
 	window_set_background_color(my_window, GColorBlack);
 //	  text_layer = text_layer_create(GRect(0, 0, 144, 20));
-	Layer * window_layer = window_get_root_layer(my_window);
+	window_layer = window_get_root_layer(my_window);
 	display_layer = layer_create(layer_get_bounds(window_layer));
 	layer_set_update_proc(display_layer, draw_layer_update_proc);
 	layer_add_child(window_layer, display_layer);
-	tick_timer_service_subscribe(MINUTE_UNIT,handle_time_change);
+	tick_timer_service_subscribe(SECOND_UNIT,handle_time_change);
 	 bluetooth_connection_service_subscribe(bluetooth_connection_callback);
 }
 
