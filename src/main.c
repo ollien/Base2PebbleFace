@@ -78,7 +78,7 @@ void draw_dot_with_text(GContext *ctx,Layer * layer, GPoint center, bool filled,
 }
 
 //if timeDot is true, do time, else, do date
-void draw_row(GContext *ctx,Layer *layer,int count,bool timeDot){
+void draw_row(GContext *ctx,Layer *layer,unsigned int count,bool timeDot){
 	int x=15;
 	struct tm * timePoint;
 	time(&now);
@@ -118,8 +118,14 @@ void draw_row(GContext *ctx,Layer *layer,int count,bool timeDot){
 		strcpy(binaryBuffer,itoa(num,2));
 		revString(binaryBuffer);
 	}
-	for (int i=0; i<count; i++){
-		char check = binaryBuffer[i];
+	for (unsigned int i=0; i<count; i++){
+		char check;
+		if (i<strlen(binaryBuffer)){
+			check = binaryBuffer[i];
+		}
+		else{
+		 	check='0';
+		}
 		if (check=='1')
 			draw_dot_with_text(ctx,layer,GPoint(x,30*rowNum),true,powIt2(i));
 		else
