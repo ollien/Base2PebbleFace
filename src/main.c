@@ -32,9 +32,10 @@ char* itoa(int val, int base){
  
 int stoi(char *str)
 {
-    int res = 0;
+	int res = 0;
     for (int i = 0; str[i] != '\0'; ++i)
         res = res*10 + str[i] - '0';
+	free(str);
     return res;
 }
 
@@ -111,8 +112,9 @@ void draw_row(GContext *ctx,Layer *layer,unsigned int count,bool timeDot){
 		else{
 			num=stoi(timeBuffer);
 		}
-		
-		strcpy(binaryBuffer,itoa(num,2));
+		char * itoaResult=itoa(num,2);
+		strcpy(binaryBuffer,itoaResult);
+		free(itoaResult);
 		revString(binaryBuffer);
 	}
 	else{
@@ -124,7 +126,9 @@ void draw_row(GContext *ctx,Layer *layer,unsigned int count,bool timeDot){
 			strftime(dayBuffer,3,"%d",timePoint);	
 		}
 		int num = stoi(dayBuffer);
-		strcpy(binaryBuffer,itoa(num,2));
+		char * itoaResult=itoa(num,2);
+		strcpy(binaryBuffer,itoaResult);
+		free(itoaResult);
 		revString(binaryBuffer);
 	}
 	for (unsigned int i=0; i<count; i++){
@@ -183,7 +187,9 @@ void add_day_of_week(Layer * layer, GContext * ctx){
 			dayBuffer="Saturday";
 			break;
 	}
-	dayBuffer=itoa(runCount,10);
+	char * itoaResult = itoa(runCount,10);
+	strcpy(dayBuffer,itoaResult);
+	free(itoaResult);
 			
 	text_layer_set_text(text_layer,dayBuffer);
 	layer_add_child(layer, text_layer_get_layer(text_layer));
@@ -212,10 +218,10 @@ void handle_time_change(struct tm *tick_time, TimeUnits units_changed){
 	textLayerIndex=0;
 	
 	
-	layer_remove_child_layers(display_layer);
+	//layer_remove_child_layers(display_layer);
 	layer_mark_dirty(display_layer);
 
-	
+	free(tick_time);
 }
 
 void bluetooth_connection_callback(bool connected){
