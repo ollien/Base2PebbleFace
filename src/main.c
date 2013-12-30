@@ -8,7 +8,8 @@ Layer * display_layer;
 char *dayBuffer;
 struct tm * timePoint;
 Layer * window_layer;
-char * numChar;
+char numChar[3];
+char *bases[]={"1","2","4","8","16","32"};
 int fourth = 0;
 TextLayer * numLayers[19];
 int textLayerIndex=0;
@@ -77,9 +78,7 @@ void draw_dot_with_text(GContext *ctx,Layer * layer, GPoint center, bool filled,
 	}
 	
 	numLayers[textLayerIndex] = text_layer_create(GRect(center.x-4,center.y-25,50,90));
-	numChar = malloc(strlen(itoa(num,10))+1);
-	strcpy(numChar,itoa(num,10));
-	text_layer_set_text(numLayers[textLayerIndex], numChar);
+	text_layer_set_text(numLayers[textLayerIndex], bases[num]);
 	text_layer_set_background_color(numLayers[textLayerIndex], GColorClear);
 	text_layer_set_text_color(numLayers[textLayerIndex], GColorWhite);
 	layer_add_child(layer,text_layer_get_layer(numLayers[textLayerIndex]));
@@ -137,9 +136,9 @@ void draw_row(GContext *ctx,Layer *layer,unsigned int count,bool timeDot){
 		 	check='0';
 		}
 		if (check=='1')
-			draw_dot_with_text(ctx,layer,GPoint(x,30*rowNum),true,powIt2(i));
+			draw_dot_with_text(ctx,layer,GPoint(x,30*rowNum),true,i);
 		else
-			draw_dot_with_text(ctx,layer,GPoint(x,30*rowNum),false,powIt2(i));
+			draw_dot_with_text(ctx,layer,GPoint(x,30*rowNum),false,i);
 		x+=23;
 	}
 	rowNum++;
@@ -211,7 +210,8 @@ void handle_time_change(struct tm *tick_time, TimeUnits units_changed){
 		text_layer_destroy(numLayers[i]);
 	}
 	textLayerIndex=0;
-	free(numChar);
+	
+	
 	layer_remove_child_layers(display_layer);
 	layer_mark_dirty(display_layer);
 
